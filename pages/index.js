@@ -1,16 +1,6 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Head from 'next/head';
-import { 
-  ArrowRight, 
-  ExternalLink, 
-  TrendingUp, 
-  Calculator as CalcIcon,
-  ChevronRight,
-  Info,
-  Star,
-  Search,
-  Filter
-} from 'lucide-react';
+import { ArrowRight, ChevronRight } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -70,17 +60,23 @@ export default function App() {
   const [rate, setRate] = useState(260);
   const [hours, setHours] = useState(25);
   const [feePercent, setFeePercent] = useState(0.12);
+  const feeChartRef = useRef(null);
+  const demandChartRef = useRef(null);
+  const chartsRef = useRef({ fee: null, demand: null });
 
   const netIncome = useMemo(() => {
-    const gross = rate * hours * 4.3; // 4.3 weeks/month
+    const gross = Number(rate) * Number(hours) * 4.3; // 4.3 weeks/month
     return Math.floor(gross * (1 - feePercent));
   }, [rate, hours, feePercent]);
 
   // 图表渲染
   useEffect(() => {
-    const feeCtx = document.getElementById('feeChart');
-    const demandCtx = document.getElementById('demandChart');
+    const feeCtx = feeChartRef.current;
+    const demandCtx = demandChartRef.current;
     if (!feeCtx || !demandCtx) return;
+
+    if (chartsRef.current.fee) chartsRef.current.fee.destroy();
+    if (chartsRef.current.demand) chartsRef.current.demand.destroy();
 
     const feeChart = new ChartJS(feeCtx, {
       type: 'bar',
@@ -128,7 +124,12 @@ export default function App() {
       }
     });
 
-    return () => { feeChart.destroy(); demandChart.destroy(); };
+    chartsRef.current = { fee: feeChart, demand: demandChart };
+
+    return () => {
+      if (chartsRef.current.fee) chartsRef.current.fee.destroy();
+      if (chartsRef.current.demand) chartsRef.current.demand.destroy();
+    };
   }, []);
 
   return (
@@ -248,11 +249,11 @@ export default function App() {
             <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-10">
               <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 space-y-6">
                 <h4 className="text-center text-[10px] font-black text-stone-500 uppercase tracking-[0.3em]">佣金对比 (%)</h4>
-                <div className="h-56 relative"><canvas id="feeChart"></canvas></div>
+                <div className="h-56 relative"><canvas id="feeChart" ref={feeChartRef}></canvas></div>
               </div>
               <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-8 space-y-6">
                 <h4 className="text-center text-[10px] font-black text-stone-500 uppercase tracking-[0.3em]">领域热度分布</h4>
-                <div className="h-56 relative"><canvas id="demandChart"></canvas></div>
+                <div className="h-56 relative"><canvas id="demandChart" ref={demandChartRef}></canvas></div>
               </div>
             </div>
           </div>
@@ -273,7 +274,7 @@ export default function App() {
                 </div>
                 <input 
                   type="range" min="50" max="1500" step="10"
-                  value={rate} onChange={e => setRate(e.target.value)}
+                  value={rate} onChange={e => setRate(Number(e.target.value))}
                   className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-amber-600"
                 />
               </div>
@@ -284,7 +285,7 @@ export default function App() {
                 </div>
                 <input 
                   type="range" min="5" max="60"
-                  value={hours} onChange={e => setHours(e.target.value)}
+                  value={hours} onChange={e => setHours(Number(e.target.value))}
                   className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-amber-600"
                 />
               </div>
