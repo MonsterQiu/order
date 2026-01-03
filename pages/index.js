@@ -5,6 +5,8 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
+  BarController,
+  DoughnutController,
   BarElement,
   Title,
   Tooltip,
@@ -17,8 +19,17 @@ import {
 // --- Chart.js 注册 ---
 if (typeof window !== 'undefined') {
   ChartJS.register(
-    CategoryScale, LinearScale, BarElement, Title, Tooltip, 
-    Legend, ArcElement, PointElement, LineElement
+    CategoryScale,
+    LinearScale,
+    BarController,
+    DoughnutController,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    ArcElement,
+    PointElement,
+    LineElement
   );
 }
 
