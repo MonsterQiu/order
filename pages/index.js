@@ -543,6 +543,15 @@ export default function App() {
         </div>
       )}
 
+      {!planOpen && (
+        <button
+          onClick={() => setPlanOpen(true)}
+          className="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-amber-600 text-white px-5 py-3 text-[10px] md:text-xs font-black uppercase tracking-[0.3em] shadow-2xl shadow-amber-200/70 hover:scale-105 transition-all"
+        >
+          开启计划
+        </button>
+      )}
+
       <main className="pt-40 pb-32 max-w-7xl mx-auto px-6 space-y-40">
         
         {/* Hero Section */}
@@ -557,10 +566,16 @@ export default function App() {
           <p className="text-stone-500 text-xl font-medium max-w-2xl mx-auto leading-relaxed">
             整合全球最优质的程序开发接单平台，助你实现从“打工人”到“独立开发者”的跨越。
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-wrap justify-center gap-4">
             <a href="#directory" className="bg-stone-900 text-white px-10 py-5 rounded-2xl font-bold flex items-center gap-2 hover:bg-stone-800 transition-all shadow-xl shadow-stone-200">
               开始探索 <ArrowRight className="w-5 h-5" />
             </a>
+            <button
+              onClick={() => setPlanOpen(true)}
+              className="bg-amber-600 text-white px-10 py-5 rounded-2xl font-bold flex items-center gap-2 hover:bg-amber-500 transition-all shadow-xl shadow-amber-200 ring-2 ring-amber-200"
+            >
+              开启计划 <ArrowRight className="w-5 h-5" />
+            </button>
           </div>
         </section>
 
