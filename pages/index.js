@@ -50,6 +50,129 @@ const PLATFORMS = [
   { id: 13, name: "V2EX - 酷工作", type: "community", tags: ["极客", "直联", "高质量"], difficulty: 3, fee: "0%", desc: "程序员最活跃的社区之一。发帖即招聘，回复即面试，沟通效率极高，项目质量往往很不错。", url: "https://www.v2ex.com/go/jobs", icon: "⚡" }
 ];
 
+const PLATFORM_PROFILES = {
+  1: { english: "low", bidding: true, longTerm: false, rate: "low" },
+  2: { english: "low", bidding: false, longTerm: true, rate: "mid" },
+  3: { english: "low", bidding: false, longTerm: true, rate: "mid" },
+  4: { english: "low", bidding: true, longTerm: false, rate: "low" },
+  5: { english: "low", bidding: false, longTerm: true, rate: "high" },
+  6: { english: "mid", bidding: false, longTerm: false, rate: "low" },
+  7: { english: "mid", bidding: true, longTerm: false, rate: "low" },
+  8: { english: "mid", bidding: true, longTerm: true, rate: "mid" },
+  9: { english: "mid", bidding: true, longTerm: true, rate: "mid" },
+  10: { english: "high", bidding: true, longTerm: true, rate: "high" },
+  11: { english: "high", bidding: false, longTerm: true, rate: "high" },
+  12: { english: "low", bidding: false, longTerm: true, rate: "mid" },
+  13: { english: "low", bidding: false, longTerm: true, rate: "mid" }
+};
+
+const TYPE_LABELS = {
+  domestic: "国内",
+  global: "国际",
+  community: "社区"
+};
+
+const EXPERIENCE_LEVELS = {
+  newbie: 1,
+  junior: 2,
+  mid: 3,
+  senior: 4
+};
+
+const ENGLISH_LEVELS = {
+  low: 0,
+  mid: 1,
+  high: 2
+};
+
+const RATE_LEVELS = ["low", "mid", "high"];
+
+const getRateLevel = (rate) => {
+  if (rate >= 400) return "high";
+  if (rate >= 200) return "mid";
+  return "low";
+};
+
+const getRecommendations = (form, platforms) => {
+  const target = form.target || "all";
+  const level = EXPERIENCE_LEVELS[form.experience] || 2;
+  const englishLevel = ENGLISH_LEVELS[form.english] ?? 1;
+  const rateLevel = getRateLevel(form.rate || 0);
+
+  return platforms
+    .map((platform) => {
+      const profile = PLATFORM_PROFILES[platform.id] || {
+        english: "low",
+        bidding: false,
+        longTerm: true,
+        rate: "mid"
+      };
+      const reasons = [];
+      let score = 0;
+
+      if (target === "all") {
+        score += 1;
+      } else if (platform.type === target) {
+        score += 4;
+        reasons.push("渠道偏好匹配");
+      } else {
+        score -= 2;
+      }
+
+      const diff = platform.difficulty - level;
+      if (diff <= 0) {
+        score += 2;
+        reasons.push("难度适配");
+      } else if (diff === 1) {
+        score += 1;
+        reasons.push("略有挑战");
+      } else {
+        score -= 2;
+      }
+
+      const requiredEnglish = ENGLISH_LEVELS[profile.english] ?? 0;
+      if (englishLevel >= requiredEnglish) {
+        score += 2;
+        reasons.push("语言要求匹配");
+      } else {
+        score -= 2;
+      }
+
+      if (form.bidding === "no" && profile.bidding) {
+        score -= 2;
+      } else if (form.bidding === "yes" && profile.bidding) {
+        score += 1;
+        reasons.push("竞标偏好匹配");
+      }
+
+      if (form.duration && form.duration !== "any") {
+        if (form.duration === "long" && profile.longTerm) {
+          score += 1;
+          reasons.push("周期偏好匹配");
+        } else if (form.duration === "short" && !profile.longTerm) {
+          score += 1;
+          reasons.push("短单偏好匹配");
+        } else {
+          score -= 1;
+        }
+      }
+
+      if (profile.rate === rateLevel) {
+        score += 1;
+        reasons.push("报价层级匹配");
+      } else if (Math.abs(RATE_LEVELS.indexOf(profile.rate) - RATE_LEVELS.indexOf(rateLevel)) >= 2) {
+        score -= 1;
+      }
+
+      return {
+        ...platform,
+        score,
+        reasons: reasons.slice(0, 3)
+      };
+    })
+    .sort((a, b) => b.score - a.score);
+};
+
 // --- 子组件: 策略项 ---
 const StrategyCard = ({ title, content }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -77,6 +200,15 @@ export default function App() {
   const [rate, setRate] = useState(260);
   const [hours, setHours] = useState(25);
   const [feePercent, setFeePercent] = useState(0.12);
+  const [planOpen, setPlanOpen] = useState(false);
+  const [planForm, setPlanForm] = useState(() => ({
+    target: "all",
+    experience: "junior",
+    english: "mid",
+    bidding: "no",
+    duration: "long",
+    rate: 260
+  }));
   const feeChartRef = useRef(null);
   const demandChartRef = useRef(null);
   const chartsRef = useRef({ fee: null, demand: null });
@@ -85,6 +217,24 @@ export default function App() {
     const gross = Number(rate) * Number(hours) * 4.3; // 4.3 weeks/month
     return Math.floor(gross * (1 - feePercent));
   }, [rate, hours, feePercent]);
+
+  const recommendations = useMemo(
+    () => getRecommendations(planForm, PLATFORMS).slice(0, 5),
+    [planForm]
+  );
+
+  const updatePlan = (key, value) => {
+    setPlanForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  useEffect(() => {
+    if (!planOpen) return;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") setPlanOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [planOpen]);
 
   // 图表渲染
   useEffect(() => {
@@ -168,9 +318,230 @@ export default function App() {
             <a href="#analytics" className="hover:text-amber-600 transition-colors">数据分析</a>
             <a href="#calc" className="hover:text-amber-600 transition-colors">收益预测</a>
           </div>
-          <button className="bg-stone-900 text-white px-5 py-2 rounded-full text-xs font-bold hover:scale-105 transition-all">开启计划</button>
+          <button
+            onClick={() => setPlanOpen(true)}
+            className="bg-stone-900 text-white px-5 py-2 rounded-full text-xs font-bold hover:scale-105 transition-all"
+          >
+            开启计划
+          </button>
         </div>
       </nav>
+
+      {planOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 px-4 py-10">
+          <div
+            className="absolute inset-0"
+            onClick={() => setPlanOpen(false)}
+            role="button"
+            tabIndex={-1}
+            aria-label="关闭"
+          />
+          <div
+            className="relative w-full max-w-5xl bg-white rounded-[2.5rem] p-8 md:p-12 shadow-2xl"
+            role="dialog"
+            aria-modal="true"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-6">
+              <div className="space-y-2">
+                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-stone-400">
+                  AI MATCH
+                </div>
+                <h3 className="text-3xl md:text-4xl font-black tracking-tight">接单平台智能推荐</h3>
+                <p className="text-stone-400 text-sm">
+                  基于你填写的信息进行本地规则匹配，不依赖外部 API。
+                </p>
+              </div>
+              <button
+                onClick={() => setPlanOpen(false)}
+                className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-400 hover:text-stone-900"
+              >
+                关闭
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mt-10">
+              <div className="space-y-8">
+                <div className="space-y-3">
+                  <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest">
+                    目标渠道
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { value: "all", label: "不限" },
+                      { value: "domestic", label: "国内" },
+                      { value: "global", label: "国际" },
+                      { value: "community", label: "社区" }
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => updatePlan("target", option.value)}
+                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                          planForm.target === option.value
+                            ? "bg-stone-900 text-white"
+                            : "bg-stone-100 text-stone-400 hover:text-stone-700"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest">
+                      经验阶段
+                    </label>
+                    <select
+                      value={planForm.experience}
+                      onChange={(event) => updatePlan("experience", event.target.value)}
+                      className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-700"
+                    >
+                      <option value="newbie">0-1 年</option>
+                      <option value="junior">1-3 年</option>
+                      <option value="mid">3-5 年</option>
+                      <option value="senior">5+ 年</option>
+                    </select>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest">
+                      英语沟通
+                    </label>
+                    <select
+                      value={planForm.english}
+                      onChange={(event) => updatePlan("english", event.target.value)}
+                      className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-700"
+                    >
+                      <option value="low">基础</option>
+                      <option value="mid">一般</option>
+                      <option value="high">流利</option>
+                    </select>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest">
+                      竞标偏好
+                    </label>
+                    <select
+                      value={planForm.bidding}
+                      onChange={(event) => updatePlan("bidding", event.target.value)}
+                      className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-700"
+                    >
+                      <option value="no">不接受竞标</option>
+                      <option value="yes">可以竞标</option>
+                      <option value="any">无所谓</option>
+                    </select>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest">
+                      项目周期
+                    </label>
+                    <select
+                      value={planForm.duration}
+                      onChange={(event) => updatePlan("duration", event.target.value)}
+                      className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-700"
+                    >
+                      <option value="long">中长期</option>
+                      <option value="short">短期小单</option>
+                      <option value="any">不限</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-end">
+                    <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest">
+                      期望时薪 (RMB)
+                    </label>
+                    <span className="text-2xl font-black text-amber-600">￥{planForm.rate}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="50"
+                    max="1500"
+                    step="10"
+                    value={planForm.rate}
+                    onChange={(event) => updatePlan("rate", Number(event.target.value))}
+                    className="w-full h-1.5 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-amber-600"
+                  />
+                </div>
+
+                <div className="flex items-center gap-3 text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em]">
+                  <div className="w-2 h-2 rounded-full bg-amber-500" />
+                  推荐结果基于本地规则匹配
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-lg font-black">匹配结果</h4>
+                  <button
+                    onClick={() =>
+                      setPlanForm({
+                        target: "all",
+                        experience: "junior",
+                        english: "mid",
+                        bidding: "no",
+                        duration: "long",
+                        rate: 260
+                      })
+                    }
+                    className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-400 hover:text-stone-900"
+                  >
+                    重置
+                  </button>
+                </div>
+
+                {recommendations.map((platform, index) => {
+                  const reasons = platform.reasons.length ? platform.reasons : ["综合匹配"];
+                  return (
+                    <div
+                      key={platform.id}
+                      className="border border-stone-200 rounded-2xl p-5 bg-stone-50/70"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="text-sm font-black text-stone-900">
+                            {index + 1}. {platform.name}
+                          </div>
+                          <div className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-400">
+                            {TYPE_LABELS[platform.type]}
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-400">
+                          Fee {platform.fee}
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-500 leading-relaxed mt-2">
+                        {platform.desc}
+                      </p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {reasons.map((reason) => (
+                          <span
+                            key={reason}
+                            className="text-[9px] font-black uppercase tracking-widest text-stone-400 bg-white border border-stone-200 px-2 py-1 rounded-md"
+                          >
+                            {reason}
+                          </span>
+                        ))}
+                      </div>
+                      <a
+                        href={platform.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mt-4"
+                      >
+                        前往平台
+                        <ArrowRight className="w-3 h-3" />
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="pt-40 pb-32 max-w-7xl mx-auto px-6 space-y-40">
         
