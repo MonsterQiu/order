@@ -9,7 +9,7 @@ const AI_PROVIDERS = {
         name: 'Google Gemini',
         icon: '🔮',
         placeholder: 'AIzaSy...',
-        endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent',
+        endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
         free: true
     },
     openai: {
@@ -371,8 +371,8 @@ export default function PlanModal({ isOpen, onClose }) {
                                         <button
                                             onClick={() => setSelectedProvider(key)}
                                             className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors ${selectedProvider === key
-                                                    ? 'bg-amber-600 text-white'
-                                                    : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                                                ? 'bg-amber-600 text-white'
+                                                : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                                                 }`}
                                         >
                                             {selectedProvider === key ? '已选择' : '选择'}
@@ -426,8 +426,8 @@ export default function PlanModal({ isOpen, onClose }) {
                                             key={option.value}
                                             onClick={() => updatePlan("target", option.value)}
                                             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${planForm.target === option.value
-                                                    ? "bg-stone-900 text-white"
-                                                    : "bg-stone-100 text-stone-400 hover:text-stone-700"
+                                                ? "bg-stone-900 text-white"
+                                                : "bg-stone-100 text-stone-400 hover:text-stone-700"
                                                 }`}
                                         >
                                             {option.label}
