@@ -18,6 +18,7 @@ import StatsSection from '../components/StatsSection';
 import SuccessStories from '../components/SuccessStories';
 import ToolsSection from '../components/ToolsSection';
 import FAQSection from '../components/FAQSection';
+import TechTrends from '../components/TechTrends';
 
 export default function Home() {
   const [filter, setFilter] = useState('all');
@@ -91,6 +92,9 @@ export default function Home() {
 
         {/* 实用工具 */}
         <ToolsSection />
+
+        {/* 技术热度趋势 */}
+        <TechTrends />
 
         {/* 数据分析 */}
         <div className="py-20 max-w-7xl mx-auto px-6">
