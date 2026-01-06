@@ -8,11 +8,11 @@ export default function Navbar({ onOpenPlan }) {
                     <div className="w-8 h-8 bg-amber-600 rounded-lg flex items-center justify-center text-white font-black text-lg shadow-lg">C</div>
                     <span className="font-extrabold text-xl tracking-tighter">CodeFreelance.</span>
                 </div>
-                <div className="hidden md:flex gap-8 text-[11px] font-black uppercase tracking-[0.2em] text-stone-400">
+                <div className="hidden md:flex gap-8 text-[11px] font-black uppercase tracking-[0.2em] text-stone-600">
                     <a href="#directory" className="hover:text-amber-600 transition-colors">渠道探寻</a>
                     <a href="#analytics" className="hover:text-amber-600 transition-colors">数据分析</a>
                     <a href="#calc" className="hover:text-amber-600 transition-colors">收益预测</a>
-                    <a href="#subscribe" className="text-amber-500 hover:text-amber-600 transition-colors">📧 订阅指南</a>
+                    <a href="#subscribe" className="text-amber-600 hover:text-amber-700 transition-colors font-black">📧 订阅指南</a>
                 </div>
                 <button
                     onClick={onOpenPlan}
