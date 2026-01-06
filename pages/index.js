@@ -9,6 +9,10 @@ import Calculator from '../components/Calculator';
 import StrategyCard from '../components/StrategyCard';
 import PlanModal from '../components/PlanModal';
 import Footer from '../components/Footer';
+// 盈利功能组件
+import SupportButton from '../components/SupportButton';
+import SponsorsSection from '../components/SponsorsSection';
+import PremiumBanner from '../components/PremiumBanner';
 
 export default function Home() {
   const [filter, setFilter] = useState('all');
@@ -28,6 +32,7 @@ export default function Home() {
 
       <PlanModal isOpen={planOpen} onClose={() => setPlanOpen(false)} />
 
+      {/* 浮动按钮组 */}
       {!planOpen && (
         <button
           onClick={() => setPlanOpen(true)}
@@ -36,6 +41,9 @@ export default function Home() {
           开启计划
         </button>
       )}
+
+      {/* 打赏按钮 */}
+      <SupportButton />
 
       <main className="pt-40 pb-32 max-w-7xl mx-auto px-6 space-y-40">
 
@@ -70,6 +78,9 @@ export default function Home() {
 
         <AnalyticsSection />
 
+        {/* 付费内容推广 */}
+        <PremiumBanner />
+
         <Calculator />
 
         {/* Strategy Section */}
@@ -99,6 +110,9 @@ export default function Home() {
         </section>
 
       </main>
+
+      {/* 赞助商区域 */}
+      <SponsorsSection />
 
       <Footer />
     </div>
