@@ -12,7 +12,7 @@ import Footer from '../components/Footer';
 // 盈利功能组件
 import SupportButton from '../components/SupportButton';
 import SponsorsSection from '../components/SponsorsSection';
-import PremiumBanner from '../components/PremiumBanner';
+import NewsletterSection from '../components/NewsletterSection';
 
 export default function Home() {
   const [filter, setFilter] = useState('all');
@@ -78,8 +78,8 @@ export default function Home() {
 
         <AnalyticsSection />
 
-        {/* 付费内容推广 */}
-        <PremiumBanner />
+        {/* 邮件订阅 - 内容预告 */}
+        <NewsletterSection />
 
         <Calculator />
 

@@ -12,6 +12,7 @@ export default function Navbar({ onOpenPlan }) {
                     <a href="#directory" className="hover:text-amber-600 transition-colors">渠道探寻</a>
                     <a href="#analytics" className="hover:text-amber-600 transition-colors">数据分析</a>
                     <a href="#calc" className="hover:text-amber-600 transition-colors">收益预测</a>
+                    <a href="#subscribe" className="text-amber-500 hover:text-amber-600 transition-colors">📧 订阅指南</a>
                 </div>
                 <button
                     onClick={onOpenPlan}
