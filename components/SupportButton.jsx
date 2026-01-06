@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Heart, X, Coffee, QrCode } from 'lucide-react';
-import Image from 'next/image';
+import { Heart, X, Coffee } from 'lucide-react';
 
 export default function SupportButton() {
     const [isOpen, setIsOpen] = useState(false);
@@ -8,13 +7,14 @@ export default function SupportButton() {
 
     return (
         <>
-            {/* 浮动按钮 */}
+            {/* 浮动赞助按钮 - 更显眼版本 */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-24 right-6 z-40 flex items-center gap-2 rounded-full bg-pink-500 text-white p-4 shadow-2xl shadow-pink-200/70 hover:scale-110 transition-all group"
+                className="fixed bottom-24 right-6 z-40 flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white px-5 py-3 shadow-2xl shadow-pink-300/50 hover:scale-105 hover:shadow-pink-400/60 transition-all group animate-pulse hover:animate-none"
                 aria-label="支持作者"
             >
-                <Heart className="w-5 h-5 group-hover:animate-pulse" fill="white" />
+                <Heart className="w-5 h-5" fill="white" />
+                <span className="text-sm font-bold">赞助</span>
             </button>
 
             {/* 弹窗 */}
@@ -47,17 +47,12 @@ export default function SupportButton() {
                             {/* 二维码显示区域 */}
                             {showQR && (
                                 <div className="bg-stone-50 rounded-2xl p-6">
-                                    <div className="relative w-48 h-48 mx-auto bg-white rounded-xl overflow-hidden border border-stone-200">
-                                        {/* 
-                      请将您的收款码图片放入 public/images/ 目录
-                      - 微信: public/images/wechat-qr.png
-                      - 支付宝: public/images/alipay-qr.png
-                    */}
-                                        <Image
+                                    <div className="w-48 h-48 mx-auto bg-white rounded-xl overflow-hidden border border-stone-200 p-2">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img
                                             src={showQR === 'wechat' ? '/images/wechat-qr.png' : '/images/alipay-qr.png'}
                                             alt={showQR === 'wechat' ? '微信收款码' : '支付宝收款码'}
-                                            fill
-                                            className="object-contain p-2"
+                                            className="w-full h-full object-contain"
                                         />
                                     </div>
                                     <p className="text-sm text-stone-500 mt-4">
