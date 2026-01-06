@@ -4,13 +4,32 @@ import { Mail, ArrowRight, CheckCircle, Sparkles } from 'lucide-react';
 export default function NewsletterSection() {
     const [email, setEmail] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (email) {
-            // 这里可以接入 Netlify Forms 或其他邮件服务
-            console.log('订阅邮箱:', email);
+        if (!email) return;
+
+        setLoading(true);
+
+        try {
+            // 提交到 Netlify Forms
+            const formData = new FormData();
+            formData.append('form-name', 'newsletter');
+            formData.append('email', email);
+
+            await fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString(),
+            });
+
             setSubmitted(true);
+        } catch (error) {
+            console.error('提交失败:', error);
+            alert('提交失败，请稍后重试');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -59,12 +78,8 @@ export default function NewsletterSection() {
                         {!submitted ? (
                             <form
                                 onSubmit={handleSubmit}
-                                name="newsletter"
-                                method="POST"
-                                data-netlify="true"
                                 className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto"
                             >
-                                <input type="hidden" name="form-name" value="newsletter" />
                                 <div className="flex-1 relative">
                                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-500" />
                                     <input
@@ -79,9 +94,10 @@ export default function NewsletterSection() {
                                 </div>
                                 <button
                                     type="submit"
-                                    className="bg-amber-500 hover:bg-amber-400 text-stone-900 font-black px-8 py-4 rounded-2xl flex items-center justify-center gap-2 transition-colors"
+                                    disabled={loading}
+                                    className="bg-amber-500 hover:bg-amber-400 disabled:bg-amber-600 text-stone-900 font-black px-8 py-4 rounded-2xl flex items-center justify-center gap-2 transition-colors"
                                 >
-                                    订阅通知 <ArrowRight className="w-4 h-4" />
+                                    {loading ? '提交中...' : <>订阅通知 <ArrowRight className="w-4 h-4" /></>}
                                 </button>
                             </form>
                         ) : (

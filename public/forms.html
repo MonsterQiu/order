@@ -1,0 +1,17 @@
+<!--
+  This file is for Netlify Forms detection.
+  Netlify scans HTML files at build time to find forms.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Form Detection</title>
+</head>
+<body>
+  <!-- Newsletter Form - for Netlify detection -->
+  <form name="newsletter" netlify netlify-honeypot="bot-field" hidden>
+    <input type="email" name="email" />
+  </form>
+</body>
+</html>
