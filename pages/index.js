@@ -13,6 +13,11 @@ import Footer from '../components/Footer';
 import SupportButton from '../components/SupportButton';
 import SponsorsSection from '../components/SponsorsSection';
 import NewsletterSection from '../components/NewsletterSection';
+// 增值功能组件
+import StatsSection from '../components/StatsSection';
+import SuccessStories from '../components/SuccessStories';
+import ToolsSection from '../components/ToolsSection';
+import FAQSection from '../components/FAQSection';
 
 export default function Home() {
   const [filter, setFilter] = useState('all');
@@ -25,7 +30,7 @@ export default function Home() {
       <Head>
         <title>CodeFreelance | 程序员接单生存指南</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="整合全球最优质的程序开发接单平台，助你实现从打工人到独立开发者的跨越。" />
+        <meta name="description" content="整合全球最优质的程序开发接单平台，助你实现从打工人到独立开发者的跨越。提供平台导航、报价工具、成功案例、接单技巧。" />
       </Head>
 
       <Navbar onOpenPlan={() => setPlanOpen(true)} />
@@ -45,15 +50,20 @@ export default function Home() {
       {/* 打赏按钮 */}
       <SupportButton />
 
-      <main className="pt-40 pb-32 max-w-7xl mx-auto px-6 space-y-40">
+      <main className="pt-40 pb-20">
+        {/* Hero */}
+        <div className="max-w-7xl mx-auto px-6 mb-20">
+          <HeroSection onOpenPlan={() => setPlanOpen(true)} />
+        </div>
 
-        <HeroSection onOpenPlan={() => setPlanOpen(true)} />
+        {/* 数据统计 */}
+        <StatsSection />
 
-        {/* Directory Section */}
-        <section id="directory" className="space-y-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-stone-100 pb-12">
+        {/* 平台目录 */}
+        <section id="directory" className="py-20 max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-stone-100 pb-12 mb-12">
             <div className="space-y-4">
-              <h2 className="text-4xl font-black tracking-tight uppercase">Platform Directory</h2>
+              <h2 className="text-4xl font-black tracking-tight">平台导航</h2>
               <p className="text-stone-400 font-medium">点击卡片直接前往平台官网。我们建议在初期深耕 2-3 个核心渠道。</p>
             </div>
             <div className="flex bg-stone-100 p-1.5 rounded-2xl">
@@ -76,18 +86,35 @@ export default function Home() {
           </div>
         </section>
 
-        <AnalyticsSection />
+        {/* 成功案例 */}
+        <SuccessStories />
 
-        {/* 邮件订阅 - 内容预告 */}
-        <NewsletterSection />
+        {/* 实用工具 */}
+        <ToolsSection />
 
-        <Calculator />
+        {/* 数据分析 */}
+        <div className="py-20 max-w-7xl mx-auto px-6">
+          <AnalyticsSection />
+        </div>
 
-        {/* Strategy Section */}
-        <section id="rules" className="space-y-12">
-          <div className="text-center space-y-4">
-            <h2 className="text-4xl font-black uppercase tracking-tight">Survival Strategy</h2>
-            <p className="text-stone-500 font-medium max-w-xl mx-auto">不仅仅是写代码，更是经营你自己。这里有一些前辈总结的生存法则。</p>
+        {/* 收益计算器 */}
+        <div className="py-20 max-w-7xl mx-auto px-6">
+          <Calculator />
+        </div>
+
+        {/* 邮件订阅 */}
+        <div className="py-20 max-w-7xl mx-auto px-6">
+          <NewsletterSection />
+        </div>
+
+        {/* 常见问题 */}
+        <FAQSection />
+
+        {/* 生存策略 */}
+        <section id="rules" className="py-20 max-w-7xl mx-auto px-6">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-4xl font-black tracking-tight">生存法则</h2>
+            <p className="text-stone-500 font-medium max-w-xl mx-auto">不仅仅是写代码，更是经营你自己。这里有一些前辈总结的经验。</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             <StrategyCard
