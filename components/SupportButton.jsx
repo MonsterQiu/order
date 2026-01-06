@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Heart, X, Coffee, QrCode } from 'lucide-react';
+import Image from 'next/image';
 
 export default function SupportButton() {
     const [isOpen, setIsOpen] = useState(false);
+    const [showQR, setShowQR] = useState(null); // 'wechat' | 'alipay' | null
 
     return (
         <>
@@ -20,11 +22,11 @@ export default function SupportButton() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-900/60 px-4">
                     <div
                         className="absolute inset-0"
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => { setIsOpen(false); setShowQR(null); }}
                     />
                     <div className="relative w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl">
                         <button
-                            onClick={() => setIsOpen(false)}
+                            onClick={() => { setIsOpen(false); setShowQR(null); }}
                             className="absolute top-4 right-4 text-stone-400 hover:text-stone-900"
                         >
                             <X className="w-5 h-5" />
@@ -42,30 +44,82 @@ export default function SupportButton() {
                                 </p>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                {/* 微信/支付宝 - 国内用户 */}
-                                <div className="border border-stone-200 rounded-2xl p-4 hover:border-green-500 transition-colors cursor-pointer group">
-                                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                                        <QrCode className="w-6 h-6 text-green-600" />
+                            {/* 二维码显示区域 */}
+                            {showQR && (
+                                <div className="bg-stone-50 rounded-2xl p-6">
+                                    <div className="relative w-48 h-48 mx-auto bg-white rounded-xl overflow-hidden border border-stone-200">
+                                        {/* 
+                      请将您的收款码图片放入 public/images/ 目录
+                      - 微信: public/images/wechat-qr.png
+                      - 支付宝: public/images/alipay-qr.png
+                    */}
+                                        <Image
+                                            src={showQR === 'wechat' ? '/images/wechat-qr.png' : '/images/alipay-qr.png'}
+                                            alt={showQR === 'wechat' ? '微信收款码' : '支付宝收款码'}
+                                            fill
+                                            className="object-contain p-2"
+                                        />
                                     </div>
-                                    <div className="text-sm font-bold text-stone-900">微信赞赏</div>
-                                    <div className="text-[10px] text-stone-400 mt-1">扫码支持</div>
+                                    <p className="text-sm text-stone-500 mt-4">
+                                        {showQR === 'wechat' ? '微信扫码支付' : '支付宝扫码支付'}
+                                    </p>
+                                    <button
+                                        onClick={() => setShowQR(null)}
+                                        className="text-[10px] font-bold text-stone-400 mt-2 hover:text-stone-900"
+                                    >
+                                        ← 返回
+                                    </button>
                                 </div>
+                            )}
 
-                                {/* Buy Me a Coffee - 国际用户 */}
-                                <a
-                                    href="https://buymeacoffee.com/codefreelance"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="border border-stone-200 rounded-2xl p-4 hover:border-amber-500 transition-colors group"
-                                >
-                                    <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                                        <Coffee className="w-6 h-6 text-amber-600" />
+                            {/* 支付选项 */}
+                            {!showQR && (
+                                <>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {/* 微信支付 */}
+                                        <button
+                                            onClick={() => setShowQR('wechat')}
+                                            className="border border-stone-200 rounded-2xl p-4 hover:border-green-500 transition-colors cursor-pointer group"
+                                        >
+                                            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                                                <span className="text-2xl">💚</span>
+                                            </div>
+                                            <div className="text-sm font-bold text-stone-900">微信支付</div>
+                                            <div className="text-[10px] text-stone-400 mt-1">扫码赞赏</div>
+                                        </button>
+
+                                        {/* 支付宝 */}
+                                        <button
+                                            onClick={() => setShowQR('alipay')}
+                                            className="border border-stone-200 rounded-2xl p-4 hover:border-blue-500 transition-colors cursor-pointer group"
+                                        >
+                                            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                                                <span className="text-2xl">💙</span>
+                                            </div>
+                                            <div className="text-sm font-bold text-stone-900">支付宝</div>
+                                            <div className="text-[10px] text-stone-400 mt-1">扫码赞赏</div>
+                                        </button>
                                     </div>
-                                    <div className="text-sm font-bold text-stone-900">Buy Me a Coffee</div>
-                                    <div className="text-[10px] text-stone-400 mt-1">国际支付</div>
-                                </a>
-                            </div>
+
+                                    {/* Buy Me a Coffee - 国际用户 */}
+                                    <a
+                                        href="https://buymeacoffee.com/codefreelance"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block w-full border border-stone-200 rounded-2xl p-4 hover:border-amber-500 transition-colors group"
+                                    >
+                                        <div className="flex items-center justify-center gap-3">
+                                            <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                <Coffee className="w-5 h-5 text-amber-600" />
+                                            </div>
+                                            <div className="text-left">
+                                                <div className="text-sm font-bold text-stone-900">Buy Me a Coffee</div>
+                                                <div className="text-[10px] text-stone-400">国际支付 (PayPal/Card)</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </>
+                            )}
 
                             <div className="pt-4 border-t border-stone-100">
                                 <p className="text-[10px] text-stone-400">
